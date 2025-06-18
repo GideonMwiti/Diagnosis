@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnosys</title>
+    <meta name="description" content="Enter your symptoms, get AI-powered diagnosis and lab test recommendations. Trusted by doctors and medical professionals.">
+    <meta name="keywords" content="health diagnosis, AI medical, symptom checker, lab tests, healthcare technology">
+    <meta property="og:title" content="Diagnosys - AI-Powered Health Diagnosis">
+    <meta property="og:description" content="Enter your symptoms, get AI-powered diagnosis and lab test recommendations.">
+    <meta property="og:type" content="website">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00A859',
+                        accent: '#E30613',
+                        'gray-50': '#F9FAFB',
+                        'gray-900': '#111827'
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .typing-animation::after {
+            content: '';
+            animation: typing 1.5s infinite;
+        }
+        
+        @keyframes typing {
+            0%, 50% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+        }
+        
+        .scroll-smooth {
+            scroll-behavior: smooth;
+        }
+        
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease-out;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .carousel-container {
+            animation: scroll 20s linear infinite;
+        }
+        
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+    </style>
+</head>
+<body class="font-sans scroll-smooth">
+    <!-- Sticky Navbar -->
+    <nav class="fixed top-0 left-0 right-0 bg-white shadow-md z-50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+               <!-- Logo -->
+        
+        <div class="flex items-center h-16"> <!-- Set navbar container height -->
+                <div class="flex-shrink-0">
+                   <img src="Logo.jpeg" alt="Diagnosys" class="max-h-16 w-auto"> <!-- Enlarged but respects container -->
+              </div>
+         </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#home" class="text-gray-700 hover:text-primary px-3 py-2 text-sm font-medium nav-link">Home</a>
+                        <a href="#about" class="text-gray-700 hover:text-primary px-3 py-2 text-sm font-medium nav-link">About</a>
+                        <div class="relative group">
+                            <button class="text-gray-700 hover:text-primary px-3 py-2 text-sm font-medium flex items-center">
+                                Products
+                                <i data-lucide="chevron-down" class="ml-1 h-4 w-4"></i>
+                            </button>
+                            <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                                <div class="py-1">
+                                    <a href="#patients" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">For Patients</a>
+                                    <a href="#doctors" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">For Doctors</a>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="#blog" class="text-gray-700 hover:text-primary px-3 py-2 text-sm font-medium nav-link">Blog</a>
+                        <a href="#contact" class="text-gray-700 hover:text-primary px-3 py-2 text-sm font-medium nav-link">Contact</a>
+                    </div>
+                </div>
+                
+                <!-- Login Button -->
+                <div class="hidden md:block">
+                    <button id="login-btn" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors duration-300">
+                        Login
+                    </button>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button class="text-gray-700 hover:text-primary" id="mobile-menu-button">
+                        <i data-lucide="menu" class="h-6 w-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
+                <a href="#home" class="text-gray-700 hover:text-primary block px-3 py-2 text-base font-medium">Home</a>
+                <a href="#about" class="text-gray-700 hover:text-primary block px-3 py-2 text-base font-medium">About</a>
+                <a href="#patients" class="text-gray-700 hover:text-primary block px-3 py-2 text-base font-medium">For Patients</a>
+                <a href="#doctors" class="text-gray-700 hover:text-primary block px-3 py-2 text-base font-medium">For Doctors</a>
+                <a href="#blog" class="text-gray-700 hover:text-primary block px-3 py-2 text-base font-medium">Blog</a>
+                <a href="#contact" class="text-gray-700 hover:text-primary block px-3 py-2 text-base font-medium">Contact</a>
+                <button id="mobile-login-btn" class="w-full mt-4 bg-primary text-white px-6 py-2 rounded-lg hover:bg-green-600 transition-colors duration-300">
+                    Login
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative h-screen flex items-center justify-center">
+        <!-- Background Image with Overlay -->
+        <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');">
+            <div class="absolute inset-0 bg-black bg-opacity-60"></div>
+        </div>
+        
+        <!-- Hero Content -->
+        <div class="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6 fade-in">Welcome to Diagnosys</h1>
+            <p class="text-xl md:text-2xl mb-8 fade-in">Enter your symptoms, get a possible diagnosis and the right lab test recommendation.</p>
+            
+            <!-- Features List -->
+            <div class="flex flex-wrap justify-center items-center gap-6 mb-10 fade-in">
+                <div class="flex items-center">
+                    <i data-lucide="cpu" class="h-5 w-5 text-primary mr-2"></i>
+                    <span>AI Powered</span>
+                </div>
+                <div class="flex items-center">
+                    <i data-lucide="zap" class="h-5 w-5 text-primary mr-2"></i>
+                    <span>Instant Results</span>
+                </div>
+                <div class="flex items-center">
+                    <i data-lucide="shield-check" class="h-5 w-5 text-primary mr-2"></i>
+                    <span>Trusted by Doctors</span>
+                </div>
+            </div>
+          <!-- CTA Buttons Section -->
+<div class="flex flex-col sm:flex-row gap-4 justify-center fade-in">
+    <!-- Diagnose Button -->
+    <button id="get-started-btn" 
+        class="bg-primary text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-green-600 transform hover:scale-105 transition-all duration-300">
+        Diagnose
+    </button>
+
+    <!-- Learn More Button -->
+    <button class="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-gray-900 transition-all duration-300" 
+        onclick="scrollToSection('about')">
+        Learn More
+    </button>
+</div>
+
+<!-- Expanded Chatbot (Initially Hidden) -->
+<div id="chatbot-expanded" 
+    class="hidden bg-white rounded-lg shadow-2xl w-80 h-96 fixed bottom-20 right-6 z-50 flex flex-col">
+    
+    <!-- Header -->
+    <div class="bg-primary text-white p-4 rounded-t-lg flex justify-between items-center">
+        <div class="flex items-center">
+            <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center mr-3">
+                <i data-lucide="user" class="h-4 w-4"></i>
+            </div>
+            <span class="font-semibold">Diagnosys AI</span>
+        </div>
+        <button id="chatbot-close" class="hover:bg-green-600 p-1 rounded">
+            <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+    </div>
+
+    <!-- Chat Content -->
+    <div class="flex-1 p-4 overflow-y-auto text-gray-800"> <!-- Ensures visible text -->
+        <div class="bg-gray-100 p-3 rounded-lg mb-4">
+            <p class="text-sm">Hello, I'm Diagnosys. How are you feeling today?</p>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div class="flex items-center text-gray-500 text-sm mb-4">
+            <div class="typing-animation mr-2">Typing...</div>
+        </div>
+
+        <!-- Pre-filled Examples -->
+        <div class="space-y-2">
+            <button class="w-full text-left p-2 text-sm border border-gray-200 rounded hover:bg-gray-50 transition-colors">
+                "I have a headache"
+            </button>
+            <button class="w-full text-left p-2 text-sm border border-gray-200 rounded hover:bg-gray-50 transition-colors">
+                "Fever and chills"
+            </button>
+            <button class="w-full text-left p-2 text-sm border border-gray-200 rounded hover:bg-gray-50 transition-colors">
+                "Stomach pain"
+            </button>
+        </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="p-4 border-t">
+        <div class="flex space-x-2">
+            <input type="text" placeholder="Describe your symptoms..." 
+                class="flex-1 p-2 border border-gray-300 rounded-lg text-sm text-gray-800 placeholder-gray-500"> <!-- fix here -->
+            <button class="bg-primary text-white p-2 rounded-lg hover:bg-green-600 transition-colors">
+                <i data-lucide="send" class="h-4 w-4"></i>
+            </button>
+        </div>
+    </div>
+</div>
+ 
+           
+    </section>
+
+   
+    
+    <!-- Sign In Modal -->
+<div id="signin-modal" class="modal">
+    <div class="modal-content">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">Sign In</h2>
+            <button class="modal-close text-gray-500 hover:text-gray-700">
+                <i data-lucide="x" class="h-6 w-6"></i>
+            </button>
+        </div>
+        
+        <!-- Social Login Buttons -->
+        <div class="space-y-3 mb-6">
+            <button class="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Login with Google
+            </button>
+            
+            <button class="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <svg class="w-5 h-5 mr-3 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                Login with Facebook
+            </button>
+        </div>
+        
+        <div class="relative mb-6">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-300"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+                <span class="px-2 bg-white text-gray-500">Or continue with email</span>
+            </div>
+        </div>
+        
+        <!-- Email Form -->
+        <form class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <div class="relative">
+                    <input type="password" id="signin-password" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent pr-10">
+                    <button type="button" onclick="togglePassword('signin-password', 'signin-eye')" class="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <i data-lucide="eye" id="signin-eye" class="h-4 w-4 text-gray-400"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-between text-sm">
+                <button type="button" class="text-primary hover:text-green-600">Forgot password?</button>
+            </div>
+            
+            <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors">
+                Sign In
+            </button>
+            
+            <div class="text-center text-sm text-gray-600">
+                Don't have an account? 
+                <button type="button" id="switch-to-signup" class="text-primary hover:text-green-600 font-semibold">Sign up</button>
+            </div>
+            
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('switch-to-signup').addEventListener('click', function() {
+        // Close the Sign In modal
+        closeModal('signin-modal');
+
+        // Scroll directly to the Patient 'Get Started' button
+        const patientButton = document.querySelector('#patients button');
+        patientButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+</script>
+
+
+    <!-- About Us Section -->
+    <section id="about" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4 fade-in">About Diagnosys</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto fade-in">We're revolutionizing healthcare with AI-powered diagnosis and personalized treatment recommendations.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Mission -->
+                <div class="text-center p-8 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 fade-in">
+                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i data-lucide="target" class="h-8 w-8 text-primary"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-4">Our Mission</h3>
+                    <p class="text-gray-600">We are here to empower better healthcare decisions by minimizing misdiagnosis through smart technology, trusted insights, and seamless lab testing guidance.</p>
+                </div>
+                
+                <!-- Vision -->
+                <div class="text-center p-8 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 fade-in">
+                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i data-lucide="eye" class="h-8 w-8 text-primary"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-4">Our Vision</h3>
+                    <p class="text-gray-600">To lead the future of digital healthcare by enabling faster, smarter, and safer diagnostic journeys for every patient.</p>
+                </div>
+                
+                <!-- Values -->
+                <div class="text-center p-8 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 fade-in">
+                    <div class="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i data-lucide="heart" class="h-8 w-8 text-primary"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-4">Our Values</h3>
+                    <p class="text-gray-600">We believe in transparency, accuracy, and patient-centered care. Our commitment to ethical AI ensures that every diagnosis is backed by scientific evidence and medical expertise.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+<!-- How It Works Section -->
+<section id="how-it-works" class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4 fade-in">How It Works</h2>
+            <p class="text-xl text-gray-600 fade-in">Simple steps to get accurate diagnosis and treatment recommendations</p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-16">
+            <!-- For Patients -->
+            <div id="patients" class="fade-in">
+                <h3 class="text-3xl font-bold text-center mb-12 text-primary">For Patients</h3>
+                <div class="space-y-8">
+                    <div class="flex items-start">
+                        <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center mr-6 flex-shrink-0">
+                            <span class="font-bold">1</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold mb-2">Enter Symptoms</h4>
+                            <p class="text-gray-600">Describe your symptoms in detail using our intuitive interface. Our AI understands natural language and medical terminology.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center mr-6 flex-shrink-0">
+                            <span class="font-bold">2</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold mb-2">AI Generates Diagnosis</h4>
+                            <p class="text-gray-600">Our advanced AI analyzes your symptoms against millions of medical cases to provide accurate possible diagnoses.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center mr-6 flex-shrink-0">
+                            <span class="font-bold">3</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold mb-2">Get Recommended Lab Tests</h4>
+                            <p class="text-gray-600">Receive personalized lab test recommendations and find nearby healthcare facilities for further examination.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-8">
+                    <button onclick="openModal('patient-modal')" class="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300">
+                        Get Started
+                    </button>
+                </div>
+            </div>
+
+            <!-- For Doctors -->
+            <div id="doctors" class="fade-in">
+                <h3 class="text-3xl font-bold text-center mb-12 text-accent">For Doctors</h3>
+                <div class="space-y-8">
+                    <div class="flex items-start">
+                        <div class="w-12 h-12 bg-accent text-white rounded-full flex items-center justify-center mr-6 flex-shrink-0">
+                            <span class="font-bold">1</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold mb-2">Sign Up</h4>
+                            <p class="text-gray-600">Join our network of medical professionals and get verified through our secure credentialing process.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <div class="w-12 h-12 bg-accent text-white rounded-full flex items-center justify-center mr-6 flex-shrink-0">
+                            <span class="font-bold">2</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold mb-2">Access Patient Cases</h4>
+                            <p class="text-gray-600">Review AI-generated diagnoses and patient cases that require professional medical validation and guidance.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start">
+                        <div class="w-12 h-12 bg-accent text-white rounded-full flex items-center justify-center mr-6 flex-shrink-0">
+                            <span class="font-bold">3</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold mb-2">Provide Expert Advice</h4>
+                            <p class="text-gray-600">Offer professional medical consultation and validate AI diagnoses to ensure the highest quality of patient care.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-8">
+                    <button onclick="openModal('doctor-modal')" class="bg-accent text-white px-8 py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors duration-300">
+                        Join as Doctor
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Patient Modal -->
+<div id="patient-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full relative">
+        <button onclick="closeModal('patient-modal')" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">&times;</button>
+        <h2 class="text-2xl font-bold text-primary mb-4 text-center">Sign Up as Patient</h2>
+        
+         <!-- Social Sign Up Buttons -->
+         <div class="space-y-3 mb-6">
+            <button class="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Continue with Google
+            </button>
+            
+            <button class="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <svg class="w-5 h-5 mr-3 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                Continue with Facebook
+            </button>
+        </div>
+        
+        <div class="text-center text-gray-500 mb-4">or continue with email</div>
+
+        <!-- Email Form -->
+        <form class="space-y-4">
+            <input type="email" placeholder="Email" required class="w-full border p-2 rounded">
+            <input type="password" placeholder="Password" required class="w-full border p-2 rounded">
+            <input type="password" placeholder="Confirm Password" required class="w-full border p-2 rounded">
+            <button type="submit" class="w-full bg-primary text-white py-2 rounded hover:bg-green-600">Sign Up</button>
+        </form>
+   
+    </div>
+</div>
+
+<!-- Doctor Modal -->
+<div id="doctor-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-8 max-w-md w-full relative">
+        <button onclick="closeModal('doctor-modal')" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">&times;</button>
+        <h2 class="text-2xl font-bold text-accent mb-4 text-center">Sign Up as Doctor</h2>
+        
+         <!-- Social Sign Up Buttons -->
+         <div class="space-y-3 mb-6">
+            <button class="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Continue with Google
+            </button>
+            
+            <button class="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <svg class="w-5 h-5 mr-3 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                Continue with Facebook
+            </button>
+        </div>
+        
+        <div class="relative mb-6">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-300"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+                <span class="px-2 bg-white text-gray-500">Or continue with email</span>
+            </div>
+        </div>
+        
+        <!-- Email Form -->
+        <form class="space-y-4">
+            <input type="email" placeholder="Email" required class="w-full border p-2 rounded">
+            <input type="password" placeholder="Password" required class="w-full border p-2 rounded">
+            <input type="password" placeholder="Confirm Password" required class="w-full border p-2 rounded">
+            <button type="submit" class="w-full bg-accent text-white py-2 rounded hover:bg-red-600">Sign Up</button>
+        </form>
+   
+   
+    </div>
+
+
+</div>
+<script>
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+    }
+    
+    function openModal(modalId) {
+        document.getElementById(modalId).classList.remove('hidden');
+    }
+    
+    // Switch between modals
+    function switchToModal(currentModalId, targetModalId) {
+        closeModal(currentModalId);
+        openModal(targetModalId);
+    }
+    </script>
+    
+<script>
+    // Open Modal by ID
+    function openModal(id) {
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    // Close Modal by ID
+    function closeModal(id) {
+        document.getElementById(id).classList.add('hidden');
+    }
+
+    // Basic Email/Password Validation Example for Both Forms
+    document.addEventListener('DOMContentLoaded', function() {
+        // Patient Form Submission
+        const patientForm = document.querySelector('#patient-modal form');
+        patientForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            handleFormSubmission(patientForm, 'Patient');
+        });
+
+        // Doctor Form Submission
+        const doctorForm = document.querySelector('#doctor-modal form');
+        doctorForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            handleFormSubmission(doctorForm, 'Doctor');
+        });
+
+        function handleFormSubmission(form, role) {
+            const email = form.querySelector('input[type="email"]').value.trim();
+            const password = form.querySelector('input[type="password"]').value.trim();
+            const confirmPassword = form.querySelectorAll('input[type="password"]')[1].value.trim();
+
+            if (!email || !password || !confirmPassword) {
+                alert(`${role} Form: Please fill in all fields.`);
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert(`${role} Form: Passwords do not match.`);
+                return;
+            }
+
+            // Here you can perform the form submission via Fetch/Ajax if needed.
+            alert(`${role} signed up successfully with email: ${email}`);
+            closeModal(role.toLowerCase() + '-modal');
+        }
+    });
+</script>
+
+   <!-- Why Choose Us Section with Hover Animations -->
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4 fade-in">Why Choose Diagnosys?</h2>
+        <p class="text-gray-600 fade-in">Discover what sets Diagnosys apart as a trusted partner in AI-powered healthcare innovation.</p>
+      </div>
+  
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-8 text-center">
+        <!-- Feature 1 -->
+        <div class="group p-6 bg-white rounded-xl shadow-md hover:shadow-2xl transition duration-500 transform hover:-translate-y-2 hover:scale-105">
+          <img src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png" alt="AI-Powered Accuracy" class="mx-auto h-16 mb-4 group-hover:animate-bounce">
+          <h3 class="font-semibold text-lg mb-2">AI-Powered Precision</h3>
+          <p class="text-gray-600">Our intelligent system enhances diagnostic accuracy, reducing errors and ensuring reliable clinical decisions.</p>
+        </div>
+  
+        <!-- Feature 2 -->
+        <div class="group p-6 bg-white rounded-xl shadow-md hover:shadow-2xl transition duration-500 transform hover:-translate-y-2 hover:scale-105">
+          <img src="https://cdn-icons-png.flaticon.com/512/2920/2920344.png" alt="Early Detection" class="mx-auto h-16 mb-4 group-hover:animate-bounce">
+          <h3 class="font-semibold text-lg mb-2">Early Disease Detection</h3>
+          <p class="text-gray-600">Identifies risk factors and potential conditions early, empowering timely interventions and saving lives.</p>
+        </div>
+  
+        <!-- Feature 3 -->
+        <div class="group p-6 bg-white rounded-xl shadow-md hover:shadow-2xl transition duration-500 transform hover:-translate-y-2 hover:scale-105">
+          <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" alt="User Friendly" class="mx-auto h-16 mb-4 group-hover:animate-bounce">
+          <h3 class="font-semibold text-lg mb-2">Simple & Intuitive</h3>
+          <p class="text-gray-600">Designed for both healthcare providers and patients, our platform ensures ease of use with no technical expertise required.</p>
+        </div>
+  
+        <!-- Feature 4 -->
+        <div class="group p-6 bg-white rounded-xl shadow-md hover:shadow-2xl transition duration-500 transform hover:-translate-y-2 hover:scale-105">
+          <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" alt="Affordable" class="mx-auto h-16 mb-4 group-hover:animate-bounce">
+          <h3 class="font-semibold text-lg mb-2">Affordable for All</h3>
+          <p class="text-gray-600">Our solution offers cost-effective diagnostic support, ideal for clinics and hospitals across emerging markets.</p>
+        </div>
+  
+        <!-- Feature 5 -->
+        <div class="group p-6 bg-white rounded-xl shadow-md hover:shadow-2xl transition duration-500 transform hover:-translate-y-2 hover:scale-105">
+          <img src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png" alt="Secure" class="mx-auto h-16 mb-4 group-hover:animate-bounce">
+          <h3 class="font-semibold text-lg mb-2">Secure & Confidential</h3>
+          <p class="text-gray-600">We prioritize data protection and patient privacy, ensuring compliance with healthcare regulations worldwide.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+ <!-- Blog Section -->
+<section id="blog" class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4 fade-in">Latest from Our Blog</h2>
+            <p class="text-xl text-gray-600 fade-in">Insights on AI-powered diagnosis, healthcare technology & patient safety.</p>
+        </div>
+
+        <!-- Blog Grid: First 3 Blogs -->
+        <div class="grid md:grid-cols-3 gap-8">
+
+            <!-- Blog 1 -->
+            <article class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 blog-card fade-in">
+                <h3 class="text-xl font-semibold mb-3">Why Misdiagnosis Happens and How to Prevent It</h3>
+                <p class="text-gray-600 mb-4 blog-excerpt">Misdiagnosis remains a hidden threat in healthcare, risking lives by delayed or wrong treatment decisions...</p>
+                <div class="blog-expanded hidden">
+                    <p class="text-gray-600 mb-4">Studies reveal that 1 in 10 diagnoses is incorrect, causing over 371,000 deaths and disabilities yearly. Reasons include incomplete patient information, time constraints, cognitive biases, and outdated tests. Prevention requires decision support tools, second opinions, improved communication, training, and data accessibility. Diagnosys AI tools ensure accurate symptom analysis and guidance to reduce these risks.</p>
+                </div>
+                <button class="toggle-btn text-primary font-semibold hover:text-green-600 transition-colors">Read More →</button>
+            </article>
+
+            <!-- Blog 2 -->
+            <article class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 blog-card fade-in">
+                <h3 class="text-xl font-semibold mb-3">The Role of Diagnostics in Saving Lives</h3>
+                <p class="text-gray-600 mb-4 blog-excerpt">Diagnostics is the critical first step in healthcare, shaping treatment success and patient survival...</p>
+                <div class="blog-expanded hidden">
+                    <p class="text-gray-600 mb-4">Accurate and timely diagnosis leads to correct treatment, avoiding complications and reducing costs. Misdiagnosis contributes to 10% of patient deaths. Technologies like AI-driven tools improve accuracy by analyzing symptoms, historical data, and risk factors. Diagnosys provides structured data tools, enhancing doctor and patient decision-making confidence while reducing diagnostic errors.</p>
+                </div>
+                <button class="toggle-btn text-primary font-semibold hover:text-green-600 transition-colors">Read More →</button>
+            </article>
+
+            <!-- Blog 3 -->
+            <article class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 blog-card fade-in">
+                <h3 class="text-xl font-semibold mb-3">The Hidden Costs of Misdiagnosis</h3>
+                <p class="text-gray-600 mb-4 blog-excerpt">Misdiagnosis doesn’t just harm health—it imposes economic and emotional burdens on patients and families...</p>
+                <div class="blog-expanded hidden">
+                    <p class="text-gray-600 mb-4">Misdiagnoses lead to wrong treatments, repeated visits, unnecessary tests, and loss of patient trust. Major misdiagnosed conditions include stroke, cancer, and sepsis. With proper diagnostic support like AI tools, the risk is lowered. Patients must also share complete information and seek second opinions to ensure correctness at first diagnosis.</p>
+                </div>
+                <button class="toggle-btn text-primary font-semibold hover:text-green-600 transition-colors">Read More →</button>
+            </article>
+
+        </div>
+
+        <!-- Hidden Blogs -->
+        <div id="extra-blogs" class="hidden grid md:grid-cols-3 gap-8 mt-8">
+
+            <!-- Blog 4 -->
+            <article class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 blog-card fade-in">
+                <h3 class="text-xl font-semibold mb-3">How AI Improves Diagnostic Accuracy</h3>
+                <p class="text-gray-600 mb-4 blog-excerpt">Artificial Intelligence is redefining diagnosis by uncovering patterns missed by human judgment...</p>
+                <div class="blog-expanded hidden">
+                    <p class="text-gray-600 mb-4">AI-driven platforms like Diagnosys analyze vast medical data, offering physicians evidence-backed suggestions. This supports early disease detection, optimized testing recommendations, and accurate risk assessment. Machine learning enables predictive analysis, vital for rare or overlapping conditions, reducing human error significantly.</p>
+                </div>
+                <button class="toggle-btn text-primary font-semibold hover:text-green-600 transition-colors">Read More →</button>
+            </article>
+
+            <!-- Blog 5 -->
+            <article class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 blog-card fade-in">
+                <h3 class="text-xl font-semibold mb-3">The Importance of Doctor-Patient Communication</h3>
+                <p class="text-gray-600 mb-4 blog-excerpt">Effective communication is the cornerstone of precise diagnosis and patient satisfaction...</p>
+                <div class="blog-expanded hidden">
+                    <p class="text-gray-600 mb-4">Doctors must encourage patients to fully describe symptoms, history, and lifestyle factors. Open dialogue allows for accurate assessments, reduced assumptions, and tailored treatments. Patients should also ask clarifying questions to understand diagnosis paths, increasing confidence and outcomes.</p>
+                </div>
+                <button class="toggle-btn text-primary font-semibold hover:text-green-600 transition-colors">Read More →</button>
+            </article>
+
+            <!-- Blog 6 -->
+            <article class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 blog-card fade-in">
+                <h3 class="text-xl font-semibold mb-3">Why You Should Always Seek a Second Opinion</h3>
+                <p class="text-gray-600 mb-4 blog-excerpt">A second opinion can be life-saving when facing critical or unclear diagnoses...</p>
+                <div class="blog-expanded hidden">
+                    <p class="text-gray-600 mb-4">Medical conditions like cancer, heart disease, or rare disorders require precise diagnosis. Seeking a second opinion reduces misdiagnosis risk and offers alternative perspectives. Diagnosys encourages this, ensuring that patients have access to the best advice and treatment options before making decisions.</p>
+                </div>
+                <button class="toggle-btn text-primary font-semibold hover:text-green-600 transition-colors">Read More →</button>
+            </article>
+
+        </div>
+
+        <!-- View More Button -->
+        <div class="text-center mt-12">
+            <button id="view-more-btn" class="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300 fade-in">
+                View All Blogs
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- JavaScript for Expand/Collapse and View More -->
+<script>
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const expanded = btn.previousElementSibling;
+            expanded.classList.toggle('hidden');
+            btn.textContent = expanded.classList.contains('hidden') ? 'Read More →' : 'Read Less ↑';
+        });
+    });
+
+    document.getElementById('view-more-btn').addEventListener('click', () => {
+        const extraBlogs = document.getElementById('extra-blogs');
+        extraBlogs.classList.toggle('hidden');
+        document.getElementById('view-more-btn').classList.add('hidden');
+    });
+</script>
+
+<!-- Contact Section -->
+<section id="contact" class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4 fade-in">Get in Touch</h2>
+            <p class="text-xl text-gray-600 fade-in">Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+        </div>
+        
+        <div class="grid lg:grid-cols-2 gap-16">
+            <!-- Google Map -->
+            <div class="fade-in">
+                <h3 class="text-2xl font-bold text-gray-900 mb-8">Our Location</h3>
+                <div class="w-full h-96 rounded-lg overflow-hidden shadow-lg">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.812496936179!2d36.79969207496693!3d-1.2651799355982416!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f174f5cc5a285%3A0xb997f1b17c3c0c7f!2sPiano%20Hub%2C%20Westlands!5e0!3m2!1sen!2ske!4v1718634662404!5m2!1sen!2ske" 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+            
+            <!-- Contact Form -->
+            <div class="fade-in">
+                <form id="contact-form" class="space-y-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="first-name" class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                            <input type="text" id="first-name" name="first-name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors">
+                        </div>
+                        <div>
+                            <label for="last-name" class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                            <input type="text" id="last-name" name="last-name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" id="email" name="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors">
+                    </div>
+                    
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone (Optional)</label>
+                        <input type="tel" id="phone" name="phone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors">
+                    </div>
+                    
+                    <div>
+                        <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                        <select id="subject" name="subject" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors">
+                            <option value="">Select a subject</option>
+                            <option value="general">General Inquiry</option>
+                            <option value="partnership">Partnership</option>
+                            <option value="support">Technical Support</option>
+                            <option value="billing">Billing Question</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                        <textarea id="message" name="message" rows="6" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors resize-none" placeholder="Tell us how we can help you..."></textarea>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input id="privacy" name="privacy" type="checkbox" required class="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary focus:ring-2">
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="privacy" class="text-gray-700">I agree to the <a href="privacy-policy.html" class="text-primary hover:text-green-600 underline">Privacy Policy</a> and <a href="terms-of-service.html" class="text-primary hover:text-green-600 underline">Terms of Service</a></label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-green-600 transform hover:scale-105 transition-all duration-300">
+                        Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+    
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-6">Quick Links</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#home" class="text-gray-300 hover:text-primary transition-colors">Home</a></li>
+                        <li><a href="#about" class="text-gray-300 hover:text-primary transition-colors">About</a></li>
+                        <li><a href="#patients" class="text-gray-300 hover:text-primary transition-colors">For Patients</a></li>
+                        <li><a href="#doctors" class="text-gray-300 hover:text-primary transition-colors">For Doctors</a></li>
+                        <li><a href="#blog" class="text-gray-300 hover:text-primary transition-colors">Blog</a></li>
+                        <li><a href="#contact" class="text-gray-300 hover:text-primary transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact Info -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-6">Contact Info</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <i data-lucide="mail" class="h-5 w-5 mr-3 text-primary"></i>
+                            <span class="text-gray-300">info@diagnosys.com</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i data-lucide="phone" class="h-5 w-5 mr-3 text-primary"></i>
+                            <span class="text-gray-300">+254 758 869067</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i data-lucide="map-pin" class="h-5 w-5 mr-3 text-primary"></i>
+                            <span class="text-gray-300">Piano Hub Westlands</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Social Links -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-6">Follow Us</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
+                            <i data-lucide="twitter" class="h-5 w-5"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/company/105868564/admin/dashboard/" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
+                            <i data-lucide="linkedin" class="h-5 w-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
+                            <i data-lucide="facebook" class="h-5 w-5"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Newsletter -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-6">Newsletter</h3>
+                    <p class="text-gray-300 mb-4">Stay updated with our latest news and updates.</p>
+                    <form id="newsletter-form" class="space-y-3">
+                        <input type="email" id="newsletter-email" placeholder="Enter your email" class="w-full p-3 bg-gray-800 text-white rounded-lg border border-gray-700 focus:border-primary focus:outline-none">
+                        <button type="submit" class="w-full bg-primary text-white p-3 rounded-lg hover:bg-green-600 transition-colors duration-300">
+                            Subscribe
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+          <!-- Copyright -->
+<div class="border-t border-gray-800 mt-12 pt-8 text-center">
+    <p class="text-gray-400">
+        &copy; <span id="currentYear"></span> Diagnosys. All rights reserved. | 
+        <a href="privacy-policy.html" class="text-primary hover:underline">Privacy Policy</a> | 
+        <a href="terms-of-service.html" class="text-primary hover:underline">Terms of Service</a>
+    </p>
+</div>
+
+<!-- JavaScript to Auto-Update Year -->
+<script>
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+</script>
+
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Sticky navbar with shadow
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-lg');
+            } else {
+                navbar.classList.remove('shadow-lg');
+            }
+        });
+        
+        // Smooth scroll function
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+        
+        // Add click listeners for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Modal functionality
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Button event listeners
+        document.getElementById('get-started-btn').addEventListener('click', () => {
+            showModal('signup-modal');
+        });
+        
+        document.getElementById('login-btn').addEventListener('click', () => {
+            showModal('signin-modal');
+        });
+        
+        document.getElementById('mobile-login-btn').addEventListener('click', () => {
+            showModal('signin-modal');
+        });
+        
+        // Join as Doctor button (in the How It Works section)
+        document.querySelector('#doctors .bg-accent').addEventListener('click', () => {
+            showModal('doctor-signup-modal');
+        });
+        
+        // Switch from sign in to sign up
+        document.getElementById('switch-to-signup').addEventListener('click', () => {
+            hideModal('signin-modal');
+            showModal('signup-modal');
+        });
+        
+        // Close modal functionality
+        document.querySelectorAll('.modal-close').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const modal = e.target.closest('.modal');
+                hideModal(modal.id);
+            });
+        });
+        
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    hideModal(modal.id);
+                }
+            });
+        });
+        
+        // Password visibility toggle
+        function togglePassword(inputId, eyeId) {
+            const input = document.getElementById(inputId);
+            const eye = document.getElementById(eyeId);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                eye.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                eye.setAttribute('data-lucide', 'eye');
+            }
+            
+            // Re-initialize lucide icons to update the changed icon
+            lucide.createIcons();
+        }
+        
+        
+    const diagnoseBtn = document.getElementById('get-started-btn');
+    const chatbotExpanded = document.getElementById('chatbot-expanded');
+    const chatbotClose = document.getElementById('chatbot-close');
+
+    // When "Diagnose" is clicked
+    diagnoseBtn.addEventListener('click', () => {
+        chatbotExpanded.classList.remove('hidden');
+    });
+
+    // When "Close" (X) is clicked
+    chatbotClose.addEventListener('click', () => {
+        chatbotExpanded.classList.add('hidden');
+    });
+
+
+        // Fade in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+        
+       
+        
+        // Contact form validation and submission
+        document.getElementById('contact-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const firstName = document.getElementById('first-name').value;
+            const lastName = document.getElementById('last-name').value;
+            const email = document.getElementById('email').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+            const privacy = document.getElementById('privacy').checked;
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (!firstName || !lastName || !email || !subject || !message || !privacy) {
+                alert('Please fill in all required fields and accept the privacy policy.');
+                return;
+            }
+            
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            
+            alert('Thank you for your message! We will get back to you soon.');
+            document.getElementById('contact-form').reset();
+        });
+        
+        // Newsletter form validation
+        document.getElementById('newsletter-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('newsletter-email').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (emailRegex.test(email)) {
+                alert('Thank you for subscribing to our newsletter!');
+                document.getElementById('newsletter-email').value = '';
+            } else {
+                alert('Please enter a valid email address.');
+            }
+        });
+        
+        // Active nav link indicator
+        function updateActiveNavLink() {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let currentSection = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (pageYOffset >= sectionTop) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('border-b-2', 'border-primary');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('border-b-2', 'border-primary');
+                }
+            });
+        }
+        
+        window.addEventListener('scroll', updateActiveNavLink);
+        
+        // Initialize animations and effects on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Trigger initial fade-in for hero content
+            setTimeout(() => {
+                document.querySelectorAll('.fade-in').forEach((el, index) => {
+                    setTimeout(() => {
+                        el.classList.add('visible');
+                    }, index * 200);
+                });
+            }, 500);
+        });
+     
+
+    
+
+
+    </script>
+</body>
+</html>
